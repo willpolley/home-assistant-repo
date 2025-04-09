@@ -13,8 +13,8 @@ blueprint:
         ThirdReality 3RSB22BZ button. It usually ends with '_action'.
       selector:
         entity:
-          integration: mqtt
           domain: sensor
+          integration: mqtt
           # You might need to adjust the domain to 'event' if Z2M creates an event entity instead of a sensor
           # Or remove the domain filter if you can't find the entity.
           # Look for an entity associated with your button device that reports states like 'single', 'double', 'hold', 'release'.
@@ -43,6 +43,8 @@ blueprint:
         action: {}
       default: []
 
+mode: restart # Allows the automation to re-trigger if the button is pressed again quickly
+max_exceeded: silent
 # This blueprint requires the Zigbee2MQTT integration to expose an 'action' entity for the button.
 # The state of this entity changes to 'single', 'double', 'hold', or 'release'.
 
@@ -83,5 +85,3 @@ action:
         sequence: !input action_release
     # Default case: Do nothing if the state is something else (e.g., empty)
     default: []
-
-mode: restart # Allows the automation to re-trigger if the button is pressed again quickly
