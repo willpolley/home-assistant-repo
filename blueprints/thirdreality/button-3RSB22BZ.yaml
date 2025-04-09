@@ -1,0 +1,87 @@
+blueprint:
+  name: Zigbee2MQTT - ThirdReality 3RSB22BZ Button Controller (with Release)
+  description: >-
+    Control lights, scenes, or other devices using a ThirdReality 3RSB22BZ
+    Zigbee button connected via Zigbee2MQTT (Z2M).
+    Handles single press, double press, hold, and release actions.
+  domain: automation
+  input:
+    button_action_entity:
+      name: Button Action Entity
+      description: >-
+        Select the 'action' sensor entity created by Zigbee2MQTT for your
+        ThirdReality 3RSB22BZ button. It usually ends with '_action'.
+      selector:
+        entity:
+          integration: mqtt
+          domain: sensor
+          # You might need to adjust the domain to 'event' if Z2M creates an event entity instead of a sensor
+          # Or remove the domain filter if you can't find the entity.
+          # Look for an entity associated with your button device that reports states like 'single', 'double', 'hold', 'release'.
+    action_single:
+      name: Single Press Action
+      description: Action to run when the button is pressed once.
+      selector:
+        action: {}
+      default: []
+    action_double:
+      name: Double Press Action
+      description: Action to run when the button is pressed twice quickly.
+      selector:
+        action: {}
+      default: []
+    action_hold:
+      name: Hold Action
+      description: Action to run when the button is pressed and held.
+      selector:
+        action: {}
+      default: []
+    action_release: # Added input for release action
+      name: Release Action
+      description: Action to run when the button is released after being held.
+      selector:
+        action: {}
+      default: []
+
+# This blueprint requires the Zigbee2MQTT integration to expose an 'action' entity for the button.
+# The state of this entity changes to 'single', 'double', 'hold', or 'release'.
+
+trigger:
+  - platform: state
+    entity_id: !input button_action_entity
+    # Trigger when the action entity changes to one of the recognized button actions
+    to:
+      - "single"
+      - "double"
+      - "hold"
+      - "release" # Added release state to trigger
+    # Optional: Uncomment the line below if you only want the automation
+    # to trigger when coming from an 'empty' or non-action state.
+    # from: null
+
+action:
+  - choose:
+      # Case 1: Single Press
+      - conditions:
+          - condition: template
+            value_template: "{{ trigger.to_state.state == 'single' }}"
+        sequence: !input action_single
+      # Case 2: Double Press
+      - conditions:
+          - condition: template
+            value_template: "{{ trigger.to_state.state == 'double' }}"
+        sequence: !input action_double
+      # Case 3: Hold
+      - conditions:
+          - condition: template
+            value_template: "{{ trigger.to_state.state == 'hold' }}"
+        sequence: !input action_hold
+      # Case 4: Release (Added)
+      - conditions:
+          - condition: template
+            value_template: "{{ trigger.to_state.state == 'release' }}"
+        sequence: !input action_release
+    # Default case: Do nothing if the state is something else (e.g., empty)
+    default: []
+
+mode: restart # Allows the automation to re-trigger if the button is pressed again quickly
