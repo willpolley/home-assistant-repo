@@ -1,16 +1,16 @@
 blueprint:
-  name: Zigbee2MQTT - ThirdReality 3RSB22BZ Button Controller (Device Trigger)
+  name: Zigbee2MQTT - Third Reality 3RSB22BZ Button Controller (Device Trigger)
   description: >-
-    Control lights, scenes, or other devices using a ThirdReality 3RSB22BZ
+    Control lights, scenes, or other devices using a Third Reality 3RSB22BZ
     Zigbee button connected via Zigbee2MQTT (Z2M).
     Uses modern MQTT Device Triggers (no legacy action sensor required).
     Handles single press, double press, hold, and release actions.
   domain: automation
   input:
     button_device:
-      name: ThirdReality Button Device
+      name: Third Reality Button Device
       description: >-
-        Select the ThirdReality 3RSB22BZ button device that is integrated
+        Select the Third Reality 3RSB22BZ button device that is integrated
         via the Zigbee2MQTT integration.
       selector:
         device:
