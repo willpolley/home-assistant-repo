@@ -74,32 +74,32 @@ trigger:
     subtype: release
     id: release_press
 
+# The 'action' block expects a sequence (list) of actions.
+# We use a single 'choose' action here to handle the different triggers.
 action:
-  # Use variables to easily access the trigger information
-  variables:
-    trigger_subtype: "{{ trigger.subtype }}" # Get the subtype ('single', 'double', 'hold', 'release') from the trigger data
-
-  # Use 'choose' to execute the correct action based on the trigger subtype
-    - choose:
+  # Use 'choose' to execute the correct action based on the trigger subtype.
+  # The trigger subtype is accessed directly via 'trigger.subtype'.
+  - choose:
       # Case 1: Single Press
       - conditions:
           - condition: template
-            value_template: "{{ trigger_subtype == 'single' }}"
+            # Use trigger.subtype directly in the condition
+            value_template: "{{ trigger.subtype == 'single' }}"
         sequence: !input action_single
       # Case 2: Double Press
       - conditions:
           - condition: template
-            value_template: "{{ trigger_subtype == 'double' }}"
+            value_template: "{{ trigger.subtype == 'double' }}"
         sequence: !input action_double
       # Case 3: Hold
       - conditions:
           - condition: template
-            value_template: "{{ trigger_subtype == 'hold' }}"
+            value_template: "{{ trigger.subtype == 'hold' }}"
         sequence: !input action_hold
       # Case 4: Release
       - conditions:
           - condition: template
-            value_template: "{{ trigger_subtype == 'release' }}"
+            value_template: "{{ trigger.subtype == 'release' }}"
         sequence: !input action_release
     # Default case: Should not be reached if triggers are set up correctly
     default: []
