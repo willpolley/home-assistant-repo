@@ -54,54 +54,52 @@ trigger:
     domain: mqtt # Specify the domain for the device trigger
     type: action # The trigger type published by Z2M for button actions
     subtype: single # The specific action subtype
-    id: single_press # Optional trigger ID for potential future use/debugging
+    id: single_press # Unique ID for the single press trigger
   - platform: device
     device_id: !input button_device
     domain: mqtt
     type: action
     subtype: double
-    id: double_press
+    id: double_press # Unique ID for the double press trigger
   - platform: device
     device_id: !input button_device
     domain: mqtt
     type: action
     subtype: hold
-    id: hold_press
+    id: hold_press # Unique ID for the hold trigger
   - platform: device
     device_id: !input button_device
     domain: mqtt
     type: action
     subtype: release
-    id: release_press
+    id: release_press # Unique ID for the release trigger
 
 # The 'action' block expects a sequence (list) of actions.
 # We use a single 'choose' action here to handle the different triggers.
 action:
-  # Use 'choose' to execute the correct action based on the trigger subtype.
-  # The trigger subtype is accessed directly via 'trigger.subtype'.
+  # Use 'choose' to execute the correct action based on which trigger fired, identified by trigger.id.
   - choose:
-      # Case 1: Single Press
+      # Case 1: Single Press Trigger Fired
       - conditions:
-          - condition: template
-            # Use trigger.subtype directly in the condition
-            value_template: "{{ trigger.subtype == 'single' }}"
+          - condition: trigger # Check which trigger fired using its ID
+            id: "single_press"
         sequence: !input action_single
-      # Case 2: Double Press
+      # Case 2: Double Press Trigger Fired
       - conditions:
-          - condition: template
-            value_template: "{{ trigger.subtype == 'double' }}"
+          - condition: trigger
+            id: "double_press"
         sequence: !input action_double
-      # Case 3: Hold
+      # Case 3: Hold Trigger Fired
       - conditions:
-          - condition: template
-            value_template: "{{ trigger.subtype == 'hold' }}"
+          - condition: trigger
+            id: "hold_press"
         sequence: !input action_hold
-      # Case 4: Release
+      # Case 4: Release Trigger Fired
       - conditions:
-          - condition: template
-            value_template: "{{ trigger.subtype == 'release' }}"
+          - condition: trigger
+            id: "release_press"
         sequence: !input action_release
-    # Default case: Should not be reached if triggers are set up correctly
+    # Default case: Should not be reached if triggers are set up correctly and have IDs.
     default: []
 
 mode: restart # Allows the automation to re-trigger if the button is pressed again quickly
