@@ -16,7 +16,7 @@ blueprint:
         device:
           integration: mqtt
           # Filter for the specific device model for easier selection
-          manufacturer: "Third Reality, Inc" # Verify this matches in your HA device info
+          manufacturer: "Third Reality" # Verify this matches in your HA device info
           model: "3RSB22BZ" # Verify this matches in your HA device info
     action_single:
       name: Single Press Action
