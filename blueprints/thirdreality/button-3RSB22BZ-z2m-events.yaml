@@ -1,0 +1,107 @@
+blueprint:
+  name: Zigbee2MQTT - ThirdReality 3RSB22BZ Button Controller (Device Trigger)
+  description: >-
+    Control lights, scenes, or other devices using a ThirdReality 3RSB22BZ
+    Zigbee button connected via Zigbee2MQTT (Z2M).
+    Uses modern MQTT Device Triggers (no legacy action sensor required).
+    Handles single press, double press, hold, and release actions.
+  domain: automation
+  input:
+    button_device:
+      name: ThirdReality Button Device
+      description: >-
+        Select the ThirdReality 3RSB22BZ button device that is integrated
+        via the Zigbee2MQTT integration.
+      selector:
+        device:
+          integration: mqtt
+          # Filter for the specific device model for easier selection
+          manufacturer: "Third Reality, Inc" # Verify this matches in your HA device info
+          model: "3RSB22BZ" # Verify this matches in your HA device info
+    action_single:
+      name: Single Press Action
+      description: Action to run when the button is pressed once.
+      selector:
+        action: {}
+      default: []
+    action_double:
+      name: Double Press Action
+      description: Action to run when the button is pressed twice quickly.
+      selector:
+        action: {}
+      default: []
+    action_hold:
+      name: Hold Action
+      description: Action to run when the button is pressed and held.
+      selector:
+        action: {}
+      default: []
+    action_release:
+      name: Release Action
+      description: Action to run when the button is released after being held.
+      selector:
+        action: {}
+      default: []
+
+# This blueprint uses MQTT device triggers provided by Zigbee2MQTT.
+# Ensure your Zigbee2MQTT Home Assistant integration settings are configured
+# to expose device triggers (this is usually the default).
+
+trigger:
+  # Define a separate trigger for each button action subtype
+  - platform: device
+    device_id: !input button_device
+    domain: mqtt # Specify the domain for the device trigger
+    type: action # The trigger type published by Z2M for button actions
+    subtype: single # The specific action subtype
+    id: single_press # Optional trigger ID for potential future use/debugging
+  - platform: device
+    device_id: !input button_device
+    domain: mqtt
+    type: action
+    subtype: double
+    id: double_press
+  - platform: device
+    device_id: !input button_device
+    domain: mqtt
+    type: action
+    subtype: hold
+    id: hold_press
+  - platform: device
+    device_id: !input button_device
+    domain: mqtt
+    type: action
+    subtype: release
+    id: release_press
+
+action:
+  # Use variables to easily access the trigger information
+  variables:
+    trigger_subtype: "{{ trigger.subtype }}" # Get the subtype ('single', 'double', 'hold', 'release') from the trigger data
+
+  # Use 'choose' to execute the correct action based on the trigger subtype
+  - choose:
+      # Case 1: Single Press
+      - conditions:
+          - condition: template
+            value_template: "{{ trigger_subtype == 'single' }}"
+        sequence: !input action_single
+      # Case 2: Double Press
+      - conditions:
+          - condition: template
+            value_template: "{{ trigger_subtype == 'double' }}"
+        sequence: !input action_double
+      # Case 3: Hold
+      - conditions:
+          - condition: template
+            value_template: "{{ trigger_subtype == 'hold' }}"
+        sequence: !input action_hold
+      # Case 4: Release
+      - conditions:
+          - condition: template
+            value_template: "{{ trigger_subtype == 'release' }}"
+        sequence: !input action_release
+    # Default case: Should not be reached if triggers are set up correctly
+    default: []
+
+mode: restart # Allows the automation to re-trigger if the button is pressed again quickly
