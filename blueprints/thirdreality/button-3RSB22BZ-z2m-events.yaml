@@ -80,7 +80,7 @@ action:
     trigger_subtype: "{{ trigger.subtype }}" # Get the subtype ('single', 'double', 'hold', 'release') from the trigger data
 
   # Use 'choose' to execute the correct action based on the trigger subtype
-  - choose:
+    - choose:
       # Case 1: Single Press
       - conditions:
           - condition: template
