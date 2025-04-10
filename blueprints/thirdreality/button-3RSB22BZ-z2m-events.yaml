@@ -17,7 +17,7 @@ blueprint:
           integration: mqtt
           # Filter for the specific device model for easier selection
           manufacturer: "Third Reality" # Verify this matches in your HA device info
-          model: "3RSB22BZ" # Verify this matches in your HA device info
+          model: "Smart button" # Verify this matches in your HA device info
     action_single:
       name: Single Press Action
       description: Action to run when the button is pressed once.
